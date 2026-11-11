@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dime Bites · Stock &amp; Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f6f2ea;--card:#fffdf9;--tx:#231f1a;--mu:#7a7266;--bd:#e7e0d3;--ac:#b45309;--ac2:#fef3c7;--ok:#166534;--bad:#b91c1c;--bar:#eadfcb;
+--serif:"Fraunces",Georgia,serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#161310;--card:#201b16;--tx:#f3ede2;--mu:#a69c8c;--bd:#38302600;--bd:#383026;--ac:#f59e0b;--ac2:#3a2a0c;--ok:#4ade80;--bad:#f87171;--bar:#3a3125;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 var(--sans)}
+main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+h1{font:700 34px/1.1 var(--serif);margin:0;letter-spacing:-.5px}
+h1 span{color:var(--ac)}
+.tag{color:var(--mu);margin:4px 0 0}
+#sync{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px}
+#sync i{width:8px;height:8px;border-radius:50%;background:var(--mu);display:inline-block}
+#sync.ok i{background:var(--ok)}#sync.err i{background:var(--bad)}
+h2{font:600 18px var(--serif);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px}
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:700px){.hero{grid-template-columns:1fr}}
+.big{font:700 44px/1.1 var(--serif);margin:4px 0 2px}
+.lbl{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+.bar{height:8px;background:var(--bar);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.bar b{display:block;height:100%;background:var(--ac);border-radius:99px;transition:width .4s}
+.mini{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.mini b{display:block;font:600 20px var(--serif)}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.prod h3{margin:0 0 2px;font:600 17px var(--serif)}
+.prod .row{display:flex;justify-content:space-between;color:var(--mu);font-size:13px}
+.prod .left{font:700 30px var(--serif);margin-top:6px}
+.low{color:var(--bad)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:4px}
+input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;width:100%}
+.pay{display:flex;gap:8px}.pay button{cursor:pointer}
+.pay button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac);font-weight:600}
+.go{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600;cursor:pointer}
+.go:disabled{opacity:.5}
+#msg{min-height:20px;font-size:13px;margin-top:10px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:9px 6px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+th{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.n{text-align:right}
+.x{background:none;border:0;color:var(--bad);cursor:pointer;width:auto;padding:2px 8px}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+details summary{cursor:pointer;font:600 18px var(--serif)}
+.note{color:var(--mu);font-size:12px;margin-top:10px}
+#warn{display:none;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:12px 14px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div><h1>Dime <span>Bites</span></h1><p class="tag">Stock &amp; sales tracker</p></div>
+<div id="sync"><i></i><span>Connecting…</span></div>
+</header>
+
+<div id="warn">Almost there: open <b>index.html</b>, find <b>DB_URL</b> near the bottom and paste your Firebase database address. Until then nothing can be saved.</div>
+
+<section class="hero card">
+<div>
+<div class="lbl">Profit so far</div>
+<div class="big" id="net">R0.00</div>
+<div class="mini" style="margin-top:8px">
+<div><span class="lbl">After 10% tax</span><b id="aft">R0.00</b></div>
+<div><span class="lbl">Still to break even</span><b id="be">R0.00</b></div>
+</div>
+<div class="bar"><b id="bar" style="width:0"></b></div>
+<div class="note" id="barnote"></div>
+</div>
+<div class="mini" style="align-content:center">
+<div><span class="lbl">Money in</span><b id="rev">R0.00</b></div>
+<div><span class="lbl">Money spent</span><b id="sp">R0.00</b></div>
+<div><span class="lbl">Units sold</span><b id="us">0</b></div>
+<div><span class="lbl">Units left</span><b id="ul">0</b></div>
+<div><span class="lbl">Profit if all sells</span><b id="pot">R0.00</b></div>
+<div><span class="lbl">…after 10% tax</span><b id="potat">R0.00</b></div>
+</div>
+</section>
+
+<div class="grid3" id="prods" style="margin-bottom:16px"></div>
+
+<section class="card">
+<h2>Record a sale</h2>
+<div class="form">
+<div><label>Product</label><select id="prod"></select></div>
+<div><label>Number sold</label><input id="qty" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+<div><label>Sold by</label><select id="by"><option>Israel</option><option>David</option><option>Mofifunoluwa</option><option>Ezekiel</option></select></div>
+<div><label>Payment method</label><div class="pay"><button type="button" data-m="SnapScan" class="on">SnapScan</button><button type="button" data-m="Bank transfer">Bank transfer</button></div></div>
+<div><button class="go" id="add">Add sale</button></div>
+</div>
+<div id="msg"></div>
+</section>
+
+<section class="card">
+<h2>Money by payment method</h2>
+<div class="grid3" id="pm"></div>
+</section>
+
+<section class="card">
+<h2>Sales log</h2>
+<div class="wrap"><table>
+<thead><tr><th>When</th><th>Product</th><th class="n">Qty</th><th>Payment</th><th>By</th><th class="n">Amount</th><th></th></tr></thead>
+<tbody id="log"></tbody>
+</table></div>
+</section>
+
+<section class="card">
+<details>
+<summary>Stock settings</summary>
+<div class="set" id="set" style="margin-top:14px"></div>
+<p class="note">Changes save for everyone. “Bought” is how many units you started with; the total spent on all stock is R1,944.80 by default.</p>
+</details>
+</section>
+</main>
+
+<script>
+/* ====== PASTE YOUR FIREBASE REALTIME DATABASE URL BETWEEN THE QUOTES ======
+   Example: "https://dime-bites-default-rtdb.firebaseio.com"  (no slash at the end) */
+var DB_URL = "https://dime-bites-default-rtdb.firebaseio.com";
+/* ======================================================================== */
+
+var DEFAULT = {spent:1944.8, products:{
+  mg:{name:"Mi Goreng", stock:80, price:10},
+  or:{name:"Oreos", stock:20, price:25},
+  dr:{name:"Cold drinks", stock:96, price:18}}};
+var cfg = null, sales = {}, method = "SnapScan";
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function R(n){var neg=n<0;return (neg?"−":"")+"R"+Math.abs(Math.round(n*100)/100).toLocaleString("en-ZA",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function url(p){return DB_URL.replace(/\/+$/,"")+p+".json"}
+function api(p,m,b){return fetch(url(p),{method:m||"GET",body:b?JSON.stringify(b):undefined}).then(function(r){if(!r.ok)throw 0;return r.json()})}
+function status(ok){var s=$("sync");s.className=ok?"ok":"err";s.lastChild.textContent=ok?"Live · shared with the team":"Offline · retrying"}
+function soldOf(id){var t=0;for(var k in sales)if(sales[k].pid===id)t+=sales[k].qty;return t}
+function listSales(){return Object.keys(sales).map(function(k){var s=sales[k];s.key=k;return s}).sort(function(a,b){return b.ts-a.ts})}
+
+function load(){
+  if(!DB_URL){$("warn").style.display="block";status(false);return Promise.resolve()}
+  return api("/config").then(function(c){
+    if(!c){return api("/config","PUT",DEFAULT).then(function(){return DEFAULT})}
+    return c;
+  }).then(function(c){cfg=c;return api("/sales")}).then(function(s){sales=s||{};status(true);render()}).catch(function(){status(false)});
+}
+
+function render(){
+  if(!cfg)return;
+  var ids=Object.keys(cfg.products),rev=0,us=0,ul=0,pot=0,html="";
+  var sel=$("prod"),cur=sel.value;
+  sel.innerHTML=ids.map(function(id){var p=cfg.products[id];return '<option value="'+id+'">'+esc(p.name)+" ("+(p.stock-soldOf(id))+" left)</option>"}).join("");
+  if(cur)sel.value=cur;
+  ids.forEach(function(id){
+    var p=cfg.products[id],s=soldOf(id),l=p.stock-s;
+    rev+=s*p.price;us+=s;ul+=l;pot+=p.stock*p.price;
+    html+='<div class="card prod" style="margin:0"><h3>'+esc(p.name)+'</h3><div class="row"><span>'+R(p.price)+' each</span><span>'+p.stock+' bought</span></div>'+
+    '<div class="left '+(l<=5?"low":"")+'">'+l+' <span style="font:500 13px var(--sans);color:var(--mu)">left</span></div>'+
+    '<div class="bar"><b style="width:'+(p.stock?100*s/p.stock:0)+'%"></b></div><div class="row"><span>'+s+' sold</span><span>'+R(s*p.price)+'</span></div></div>';
+  });
+  $("prods").innerHTML=html;
+  var sp=cfg.spent,net=rev-sp,tax=net>0?net*0.1:0,ptax=pot-sp>0?(pot-sp)*0.1:0;
+  $("net").textContent=R(net);$("net").className="big "+(net>=0?"pos":"neg");
+  $("aft").textContent=R(net-tax);$("be").textContent=R(Math.max(0,sp-rev));
+  $("rev").textContent=R(rev);$("sp").textContent=R(sp);$("us").textContent=us;$("ul").textContent=ul;
+  $("pot").textContent=R(pot-sp);$("potat").textContent=R(pot-sp-ptax);
+  var pct=sp?Math.min(100,100*rev/sp):0;$("bar").style.width=pct+"%";
+  $("barnote").textContent=net>=0?"Spend recovered. Everything from here is profit.":Math.round(pct)+"% of your R"+sp.toLocaleString("en-ZA")+" back so far";
+  var pm="";["SnapScan","Bank transfer"].forEach(function(m){
+    var a=0,n=0;listSales().forEach(function(s){if(s.method===m&&cfg.products[s.pid]){a+=s.qty*cfg.products[s.pid].price;n++}});
+    pm+='<div class="card" style="margin:0"><span class="lbl">'+m+" · "+n+' sales</span><div style="font:600 24px var(--serif)">'+R(a)+"</div></div>";
+  });
+  $("pm").innerHTML=pm;
+  var ls=listSales();
+  $("log").innerHTML=ls.length?ls.map(function(s){var p=cfg.products[s.pid]||{name:"?",price:0};
+    return "<tr><td>"+new Date(s.ts).toLocaleString("en-ZA",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+"</td><td>"+esc(p.name)+'</td><td class="n">'+s.qty+"</td><td>"+esc(s.method)+"</td><td>"+esc(s.by||"")+'</td><td class="n">'+R(s.qty*p.price)+'</td><td><button class="x" data-del="'+s.key+'" title="Delete sale">✕</button></td></tr>'}).join(""):'<tr><td colspan="7" style="color:var(--mu)">No sales yet.</td></tr>';
+  if(!document.querySelector("#set input:focus")){
+    $("set").innerHTML='<div><label>Total spent on stock (R)</label><input type="number" step="0.01" data-f="spent" value="'+sp+'"></div>'+ids.map(function(id){var p=cfg.products[id];
+      return '<div><label>'+esc(p.name)+' · bought</label><input type="number" data-id="'+id+'" data-f="stock" value="'+p.stock+'"></div><div><label>'+esc(p.name)+' · price (R)</label><input type="number" step="0.5" data-id="'+id+'" data-f="price" value="'+p.price+'"></div>'}).join("");
+  }
+}
+
+document.querySelectorAll(".pay button").forEach(function(b){b.onclick=function(){method=b.dataset.m;document.querySelectorAll(".pay button").forEach(function(x){x.classList.toggle("on",x===b)})}});
+try{var sb=localStorage.getItem("dime-by");if(sb)$("by").value=sb}catch(e){}
+$("by").onchange=function(){try{localStorage.setItem("dime-by",$("by").value)}catch(e){}};
+
+$("add").onclick=function(){
+  var m=$("msg");
+  if(!cfg){m.textContent="Not connected yet.";m.className="neg";return}
+  var id=$("prod").value,p=cfg.products[id],q=parseInt($("qty").value,10);
+  if(!q||q<1){m.textContent="Enter how many were sold.";m.className="neg";return}
+  var l=p.stock-soldOf(id);
+  if(q>l){m.textContent="Only "+l+" "+p.name+" left in stock.";m.className="neg";return}
+  $("add").disabled=true;
+  api("/sales","POST",{pid:id,qty:q,method:method,by:$("by").value,ts:Date.now()}).then(function(){
+    $("qty").value=1;m.textContent="Added: "+q+" × "+p.name+" via "+method+" ("+R(q*p.price)+").";m.className="pos";return load();
+  }).catch(function(){m.textContent="Couldn’t save. Check your connection and try again.";m.className="neg"}).then(function(){$("add").disabled=false});
+};
+document.addEventListener("click",function(e){
+  var k=e.target.dataset&&e.target.dataset.del;if(!k)return;
+  if(!confirm("Delete this sale?"))return;
+  api("/sales/"+k,"DELETE").then(load).catch(function(){status(false)});
+});
+document.addEventListener("change",function(e){
+  var t=e.target,f=t.dataset&&t.dataset.f;if(!f||!cfg)return;
+  var v=Math.max(0,parseFloat(t.value)||0);
+  if(f==="spent")cfg.spent=v;else cfg.products[t.dataset.id][f]=v;
+  api("/config","PUT",cfg).then(load).catch(function(){status(false)});
+});
+load();
+setInterval(function(){if(!document.querySelector("#set input:focus"))load()},5000);
+</script>
+</body>
+</html>
