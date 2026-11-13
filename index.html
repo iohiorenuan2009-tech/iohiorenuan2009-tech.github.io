@@ -126,11 +126,16 @@ details[open] > summary{margin-bottom:16px}
       <div><div class="lbl">Still to break even</div><b id="be">R0.00</b></div>
     </div>
     <div class="bar"><i id="bar" style="width:0"></i></div>
-    <div class="note" id="barnote"></div>
+    <div class="note" id="barnote" style="margin-top:0"></div>
+    <div class="lbl" style="margin-top:18px">Revenue target (all stock sold)</div>
+    <div class="bar" style="margin-top:8px"><i id="bar2" style="width:0"></i></div>
+    <div class="note" id="bar2note" style="margin-top:0"></div>
   </div>
   <div class="stats">
     <div><div class="lbl">Money in</div><b id="rev">R0.00</b></div>
     <div><div class="lbl">Money spent</div><b id="sp">R0.00</b></div>
+    <div><div class="lbl">Revenue target</div><b id="tgt">R0.00</b></div>
+    <div><div class="lbl">Still to collect</div><b id="tc">R0.00</b></div>
     <div><div class="lbl">Units sold</div><b id="us">0</b></div>
     <div><div class="lbl">Units left</div><b id="ul">0</b></div>
     <div><div class="lbl">Profit if all sells</div><b id="pot">R0.00</b></div>
@@ -314,6 +319,13 @@ function render(){
   var pct=sp?Math.min(100,100*rev/sp):0;
   $("bar").style.width=pct+"%";
   $("barnote").textContent=net>=0?"Spend recovered. Everything from here is profit.":Math.round(pct)+"% of your R"+sp.toLocaleString("en-ZA")+" back so far";
+
+  /* Revenue target = what all the stock brings in if it fully sells */
+  var tp=pot?Math.min(100,100*rev/pot):0,up=(us+ul)?100*us/(us+ul):0;
+  $("tgt").textContent=R(pot);
+  $("tc").textContent=R(Math.max(0,pot-rev));
+  $("bar2").style.width=tp+"%";
+  $("bar2note").textContent=Math.round(tp)+"% of the "+R(pot)+" target collected · "+Math.round(up)+"% of stock sold (goal: 80%)";
 
   var live=listOf(sales);
   var pm="";
